@@ -1,0 +1,91 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
+<!-- Add custom styles for centering and formatting -->
+<style>
+.centered-div {
+    width: 50%; /* Adjust this value to control the width of the centered div */
+    margin: 0 auto; /* This centers the div horizontally */
+}
+
+.like-button i.fas.fa-heart, .like-button i.far.fa-heart {
+    color: red !important; /* Set the icon color to red */
+    border: 1px solid red; /* Add a red border around the heart icon */
+    border-radius: 50%; /* Make the border circular for the heart icon */
+    padding: 5px; /* Adjust the padding to control the size of the border */
+    margin-right: 5px; /* Add spacing to separate the icon from the text */
+    background-color: transparent;
+}
+
+
+</style>
+
+
+
+
+
+    <main class="profile-page layout layout--2">
+
+        <div class="centered-div">
+            <h2>Post a New Status</h2>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.media }}
+                {{ form.as_p }}
+                <button type="submit">Post Status</button>
+            </form>
+        </div>
+
+        <!-- status/status.html -->
+        <div class="centered-div">
+            <h1>Status Updates</h1>
+            <ul>
+                {% for status in statuses %}
+                <hr>
+                <br>
+                <a href="{% url 'current_status' status.id %}"><i class="fas fa-link"></i></a>
+                {% if status.user == user %}
+                <form method="post" action="{% url 'status_delete' status.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Delete</button>
+                </form>
+                {% endif %}
+                <div>
+                    <span>{{ status.user.username }}</span> - {{ status.created }}
+                    <div class="status-text">{{ status.text|safe }}</div>
+                    <form method="post" action="{% url 'like_status' status.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="like-button">
+                            {% if request.user in status.liked_by.all %}
+                                <i class="fas fa-heart"></i>
+                            {% else %}
+                                <i class="far fa-heart"></i>
+                            {% endif %}
+                        </button>
+                    </form>
+                    <span class="likes-count">{{ status.liked_by.count }}</span> Likes
+
+                </div>
+                <hr>
+                {% endfor %}
+            </ul>
+        </div>
+
+
+    </main>
+    <script src="script.js"></script>
+
+{% endblock content %}
+
+
+
+
+
+
+
+
+
